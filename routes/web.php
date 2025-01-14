@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\KampanyeController;
+use App\Http\Controllers\DonasiController;
 
 
 // Routing Landing Page
@@ -28,4 +30,9 @@ Route::get('/form-donasi', function () {
 
 Route::get('/dashboard', function(){
     return view('admin.dashboard');
+});
+
+Route::prefix('admin')->group(function(){
+Route::get('/kampanye', [KampanyeController::class, 'index']);
+Route::resource('donasi', DonasiController::class);
 });
