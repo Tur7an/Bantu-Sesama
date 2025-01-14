@@ -14,8 +14,8 @@ class DonasiController extends Controller
      */
     public function index()
     {
-        $donasi = Donasi::join('kampanye', 'donasi.kampanye_id', '=', 'kampanye.id')
-        ->select('donasi.*', 'kampanye.nama as nama_kampanye')
+        $donasi = Donasi::join('kampanye', 'kampanye_id', '=', 'kampanye.id')
+        ->select('donasi.*', 'kampanye.nama as kampanye')
         ->get();
         // $donasi = DB::table('donasi')->get();
         return view ('admin.donasi.index', compact('donasi'));

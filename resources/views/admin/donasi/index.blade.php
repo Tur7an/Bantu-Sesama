@@ -33,7 +33,7 @@
                   <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-0">{{$loop->iteration}}</h6></td>
                   <td class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">{{$d->kampanye->nama}}</h6></td>
+                    <h6 class="fw-semibold mb-0">{{$d->kampanye}}</h6></td>
                   <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-0">{{$d->nama_donatur}}</h6></td>
                   <td class="border-bottom-0">
