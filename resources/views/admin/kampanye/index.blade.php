@@ -1,6 +1,10 @@
 @extends('admin.layouts.app')
 @section('content')
 
+<div class="card-body p-4 text-end">
+    <a href="{{route('kampanye.create')}}" class="btn btn-primary m-1"><i class="fa-regular fa-square-plus"></i>&nbsp Tambah Kampanye</a>
+</div>
+
 <div class="row">
     <div class="col-lg-12 d-flex align-items-stretch">
       <div class="card w-100">
@@ -44,7 +48,7 @@
                     <p class="mb-0 fw-normal">{{$k->deskripsi}}</p>
                   </td>
                   <td class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0 fs-4">{{$k->batas_nominal}}</h6>
+                    <h6 class="fw-semibold mb-0 fs-4">Rp{{ number_format($k->batas_nominal, 0, ',', '.') }}</h6>
                   </td>
                   <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-0 fs-4">{{$k->batas_tanggal}}</h6>
@@ -55,7 +59,8 @@
                       </div>
                   </td>
                   <td class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0 fs-4"></h6>
+                    <a href="{{route('kampanye.edit', $k->id)}}"><i class="fa-solid fa-pen-to-square fa-xl" style="color: #FFD43B;"></i></a>
+                    <a href="{{route('kampanye.show', $k->id)}}"><i class="fa-solid fa-eye fa-xl" style="color: #0058f0;"></i></a>
                   </td>
                 </tr>
                 @endforeach

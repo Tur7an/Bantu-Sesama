@@ -33,6 +33,7 @@ Route::get('/dashboard', function(){
 });
 
 Route::prefix('admin')->group(function(){
-Route::get('/kampanye', [KampanyeController::class, 'index']);
+// Route::get('/kampanye', [KampanyeController::class, 'index']);
+Route::resource('kampanye', KampanyeController::class);
 Route::resource('donasi', DonasiController::class);
 });

@@ -7,6 +7,7 @@
   <title>Dashboard Admin</title>
   <link rel="shortcut icon" type="image/png" href="{{asset('admin')}}/assets/images/logos/favicon.png" />
   <link rel="stylesheet" href="{{asset('admin')}}/assets/css/styles.min.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -53,7 +54,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="./ui-alerts.html" aria-expanded="false">
+              <a class="sidebar-link" href="{{url('admin/donasi')}}" aria-expanded="false">
                 <span>
                   <i class="ti ti-alert-circle"></i>
                 </span>
