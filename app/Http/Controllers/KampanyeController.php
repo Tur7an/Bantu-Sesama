@@ -31,6 +31,29 @@ class KampanyeController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'nama' => 'required|max:50',
+            'deskripsi' => 'required',
+            'batas_nominal' => 'required',
+            'batas_tanggal' => 'required',
+            'status' => 'required',
+            'foto' => 'required|image|mimes:jpg,png,jpeg|max:2048',
+        ],
+        [
+            'nama.max50' => 'Nama Maksimal 50 Karakter',
+            'nama.required' => 'Nama Kampanye Wajib Diisi',
+            'deskripsi.required' => 'Deskripsi Wajib Diisi',
+            'batas_nominal.required' => 'Batas Nominal Wajib Diisi',
+            'batas_nominal.numeric' => 'Batas Nominal Wajib Angka',
+            'batas_tanggal.required' => 'Batas Tanggal Wajib Diisi',
+            'batas_tanggal.numeric' => 'Batas Tanggal Wajib Angka',
+            'foto.required' => 'Foto Wajib Diisi',
+            'foto.max' => 'Foto Maksimal 2MB',
+            'foto.mimes' => 'Format Foto Hanya Bisa .jpg, .png, .jpeg',
+            'foto.image' => 'Foto Harus Berbentuk Image',
+        ]
+        );
+
         // Upload Foto
         $fileName = 'foto-'.uniqid().'.'.$request->foto->extension();
         $request->foto->move(public_path('admin/assets/images/kampanye'), $fileName);
@@ -41,6 +64,7 @@ class KampanyeController extends Controller
             'deskripsi'=>$request->deskripsi,
             'batas_nominal'=>$request->batas_nominal,
             'batas_tanggal'=>$request->batas_tanggal,
+            'dana_terkumpul'=> 0,
             'status'=>$request->status,
             'foto' =>$fileName,
         ]);
