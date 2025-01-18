@@ -49,12 +49,35 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-            <li><a href="{{ route('home') }}#hero">Home</a></li>
-          <li><a href="{{ route('home') }}#donasi">Donasi</a></li>
+            <li><a href="{{ route('beranda') }}#hero">Beranda</a></li>
+          <li><a href="{{ route('beranda') }}#donasi">Donasi</a></li>
           <li><a href="{{ route('pantau-donasi') }}">Pantau Donasi</a></li>
           <li><a href="{{ route('tentang-kami') }}">Tentang Kami</a></li>
-          <li><a href="{{ route('home') }}#kontak">Kontak</a></li>
-          <a class="btn-getstarted flex-md-shrink-0" href="index.html">Dashboard</a>
+          <li><a href="{{ route('beranda') }}#kontak">Kontak</a></li>
+          @guest
+                    <a class="btn-getstarted flex-md-shrink-0" href="{{ route('login') }}">Login</a>
+                @else
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            {{ Auth::user()->name }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <!-- Tombol Dashboard -->
+                            <a class="dropdown-item" href="{{ url('/dashboard') }}">Dashboard</a>
+
+                            <!-- Tombol Logout -->
+                            <a class="dropdown-item" href="{{ route('logout') }}"
+                               onclick="event.preventDefault();
+                                         document.getElementById('logout-form').submit();">
+                                Logout
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
+                        </div>
+
+                    </li>
+                @endguest
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
