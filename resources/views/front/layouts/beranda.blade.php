@@ -46,50 +46,63 @@
     </section><!-- /Hero Section -->
 
     <!-- Values Section -->
-    <section id="donasi" class="values section">
+<section id="donasi" class="values section">
 
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>Kampanye Donasi</h2>
-        <p>Pilih Donasi dan Mulai Berbagi.<br></p>
-      </div><!-- End Section Title -->
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Kampanye Donasi</h2>
+      <p>Pilih Donasi dan Mulai Berbagi.<br></p>
+    </div><!-- End Section Title -->
 
-      <div class="container">
-
+    <div class="container">
         <div class="row gy-4">
-
+          @foreach ($kampanye as $k)
           <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
             <div class="card">
-              <img src="{{asset('front')}}/assets/img/values-1.png" class="img-fluid" alt="">
-              <h3>Lorem, ipsum dolor.</h3>
-              <p>----------------------------------------------------------------------</p>
-              <a class="btn btn-primary" href="{{ route('form-donasi') }}">Mulai Donasi</a>
+              <!-- Gambar Kampanye -->
+              <img src="{{ url('admin/assets/images/kampanye') }}/{{ $k->foto }}" class="img-fluid" alt="foto-kampanye">
+
+              <!-- Nama Kampanye -->
+              <h5 class="mt-3"><b>{{ $k->nama }}</b></h5>
+
+              @php
+              $now = \Carbon\Carbon::now(); // Waktu saat ini
+              $targetDate = \Carbon\Carbon::parse($k->batas_tanggal); // Tanggal batas dari database
+              $daysLeft = $now->lessThan($targetDate) ? round($now->diffInDays($targetDate), 0) : 0; // Hitung sisa hari dan bulatkan
+              @endphp
+                <p><b>Waktu Tersisa:</b>
+                    {{ $daysLeft > 0 ? $daysLeft . ' hari lagi' : 'Waktu habis' }}
+                </p>
+
+              <!-- Dana Terkumpul -->
+              <div class="mb-2">
+                <span><b>Terkumpul:</b> Rp.{{ number_format($k->dana_terkumpul, 0, ',', '.') }}</span>
+                <span><b>Dari:</b> Rp.{{ number_format($k->batas_nominal, 0, ',', '.') }}</span>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="progress" style="height: 15px;">
+                @php
+                  $percentage = ($k->dana_terkumpul / $k->batas_nominal) * 100;
+                @endphp
+                <div class="progress-bar bg-primary" role="progressbar"
+                     style="width: {{ $percentage > 100 ? 100 : $percentage }}%;"
+                     aria-valuenow="{{ $percentage }}"
+                     aria-valuemin="0"
+                     aria-valuemax="100">
+                  {{ round($percentage, 2) }}%
+                </div>
+              </div>
+
+              <!-- Tombol Donasi -->
+              <a class="btn btn-outline-primary m-1" href="{{url('form-donasi/'.$k->id)}}">Mulai Donasi</a>
             </div>
           </div><!-- End Card Item -->
-
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="card">
-              <img src="{{asset('front')}}/assets/img/values-2.png" class="img-fluid" alt="">
-              <h3>Voluptatem voluptatum alias</h3>
-              <p>----------------------------------------------------------------------</p>
-              <a class="btn btn-primary" href="{{ route('form-donasi') }}">Mulai Donasi</a>
-            </div>
-          </div><!-- End Card Item -->
-
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
-            <div class="card">
-              <img src="{{asset('front')}}/assets/img/values-3.png" class="img-fluid" alt="">
-              <h3>Fugit cupiditate alias nobis.</h3>
-              <p>----------------------------------------------------------------------</p>
-              <a class="btn btn-primary" href="{{ route('form-donasi') }}">Mulai Donasi</a>
-            </div>
-          </div><!-- End Card Item -->
-
+          @endforeach
         </div>
-
       </div>
 
-    </section><!-- /Values Section -->
+
 
     <!-- Contact Section -->
     <section id="kontak" class="contact section">

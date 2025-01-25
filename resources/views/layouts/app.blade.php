@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,69 +8,154 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'BantuSesama') }}</title>
 
     <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
-    <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <!-- Custom CSS -->
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+            color: #212529;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        a:hover {
+            color: #0d6efd;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .navbar-toggler {
+            display: none;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            border: none;
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-item {
+            display: inline;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .nav-link:hover {
+            color: #0d6efd;
+        }
+
+        /* Dropdown styles */
+        .dropdown-menu {
+            position: absolute;
+            right: 2rem;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 0.25rem;
+            padding: 0.5rem 0;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown-menu .dropdown-item {
+            padding: 0.5rem 1rem;
+            color: #212529;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #0d6efd;
+        }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        /* Content styles */
+        main {
+            padding: 2rem;
+        }
+
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+    </style>
 </head>
+
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+        <nav class="navbar">
+            <a class="navbar-brand" href="{{ url('/') }}">
+                {{ config('app.name', 'BantuSesama') }}
+            </a>
+            <button class="navbar-toggler" type="button">
+                ☰
+            </button>
+            <ul class="navbar-nav">
+                @guest
+                @if (Route::has('login'))
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                </li>
+                @endif
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
+                @if (Route::has('register'))
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                </li>
+                @endif
+                @else
+                <li class="nav-item dropdown">
+                    <a id="navbarDropdown" class="nav-link" href="#" role="button">
+                        {{ Auth::user()->name }}
+                    </a>
 
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
-
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
-                    </ul>
-                </div>
-            </div>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{{ route('logout') }}"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            {{ __('Logout') }}
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    </div>
+                </li>
+                @endguest
+            </ul>
         </nav>
 
         <main class="py-4">
@@ -77,4 +163,5 @@
         </main>
     </div>
 </body>
+
 </html>

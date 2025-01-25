@@ -1,84 +1,140 @@
 @extends('front.layouts.app')
 @section('content')
 
+@foreach ($kampanye as $k)
 <main class="main">
-
-    <!-- Page Title -->
     <div class="page-title">
-      <div class="heading">
-      <nav class="breadcrumbs">
+        <div class="heading">
+            <nav class="breadcrumbs">
+                <div class="container">
+                    <ol>
+                        <li><a href="{{ route('beranda') }}#donasi">Home</a></li>
+                        <li class="current">Form Donasi</li>
+                    </ol>
+                </div>
+            </nav>
+        </div>
+
         <div class="container">
-          <ol>
-            <li><a href="{{ route('home') }}#donasi">Home</a></li>
-            <li class="current">Form Donasi</li>
-          </ol>
-        </div>
-      </nav>
-
-      <div class="container">
-        <div class="row">
-          <!-- Blog Details Section -->
-          <div class="col-lg-6">
-            <section id="blog-details" class="blog-details">
-              <article class="article">
-                <div class="post-img mb-3">
-                  <img src="{{ asset('front/assets/img/blog/blog-1.jpg') }}" alt="Blog Image" class="img-fluid rounded">
+            <div class="row">
+                <!-- Card Detail Donasi -->
+                <div class="col-lg-6">
+                    <section id="blog-details" class="blog-details">
+                        <article class="article">
+                            <div class="post-img mb-3">
+                                <img src="{{ url('admin/assets/images/kampanye') }}/{{ $k->foto }}" alt="Donasi" class="img-fluid rounded d-block mx-auto">
+                            </div>
+                            <h1>{{ $k->nama }}</h1>
+                            <h6><b>{{ $k->deskripsi }}</b></h6>
+                            <div class="d-flex flex-wrap align-items-center mb-4">
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-3">
+                                        @php
+                                        $now = \Carbon\Carbon::now(); // Waktu saat ini
+                                        $targetDate = \Carbon\Carbon::parse($k->batas_tanggal); // Tanggal batas dari database
+                                        $daysLeft = $now->lessThan($targetDate) ? round($now->diffInDays($targetDate), 0) : 0; // Hitung sisa hari dan bulatkan
+                                        @endphp
+                                            <p><i class="bi bi-clock me-2"></i><b>Waktu Tersisa:</b>
+                                                {{ $daysLeft > 0 ? $daysLeft . ' hari lagi' : 'Waktu habis' }}
+                                            </p>
+                                    </li><br>
+                                    <li class="list-inline-item">
+                                        <span><b>Terkumpul:</b> Rp.{{ number_format($k->dana_terkumpul, 0, ',', '.') }}</span>
+                                        <span><b>Dari:</b> Rp.{{ number_format($k->batas_nominal, 0, ',', '.') }}</span>
+                                        <div class="progress" style="height: 15px;">
+                                            @php
+                                            $percentage = ($k->dana_terkumpul / $k->batas_nominal) * 100;
+                                            @endphp
+                                            <div class="progress-bar bg-primary" role="progressbar"
+                                                style="width: {{ $percentage > 100 ? 100 : $percentage }}%;"
+                                                aria-valuenow="{{ $percentage }}"
+                                                aria-valuemin="0"
+                                                aria-valuemax="100">
+                                                {{ round($percentage, 2) }}%
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </article>
+                    </section>
                 </div>
+                <!-- End Card Detail Donasi -->
 
-                <h2 class="title">Dolorum optio tempore voluptas dignissimos cumque fuga qui quibusdam quia</h2>
+                <!-- Form Donasi -->
+                <div class="col-lg-6 sidebar">
+                    <div class="widgets-container">
+                        <h4 class="mb-3">Berdonasi</h4>
+                        <p class="mb-4">Silahkan isi form di bawah ini untuk melakukan donasi</p>
+                        @if (session('success'))
+                        <div class="alert alert-success">
+                                {{ session('success') }}
+                        </div>
+                        @endif
 
-                <div class="meta-top d-flex flex-wrap align-items-center mb-4">
-                  <ul class="list-inline mb-0">
-                    <li class="list-inline-item me-3">
-                      <i class="bi bi-person me-2"></i>
-                      <a href="blog-details.html">John Doe</a>
-                    </li>
-                    <li class="list-inline-item me-3">
-                      <i class="bi bi-clock me-2"></i>
-                      <a href="blog-details.html"><time datetime="2022-01-01">Jan 1, 2022</time></a>
-                    </li>
-                    <li class="list-inline-item">
-                      <i class="bi bi-chat-dots me-2"></i>
-                      <a href="blog-details.html">12 Comments</a>
-                    </li>
-                  </ul>
-                </div>
+                        @if (session('error'))
+                            <div class="alert alert-danger">
+                                {{ session('error') }}
+                            </div>
+                        @endif
 
-                <div class="content">
-                  <p>
-                    Similique neque nam consequuntur ad non maxime aliquam quas. Quibusdam animi praesentium. Aliquam et laboriosam eius aut nostrum quidem aliquid dicta.
-                    Et eveniet enim. Qui velit est ea dolorem doloremque deleniti aperiam unde soluta. Est cum et quod quos aut ut et sit sunt. Voluptate porro consequatur assumenda perferendis dolore.
-                  </p>
+                        <form action="{{ route('donasi.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="kampanye_id" value="{{ $k->id }}">
+                            <!-- Nama Donatur -->
+                            <div class="form-group mb-3">
+                                <label for="nama">Nama Donatur</label>
+                                <input
+                                    id="nama"
+                                    name="nama_donatur"
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="Nama (Sembunyikan Nama Dengan 'Orang Baik')"
+                                    required
+                                >
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-dark m-1 btn-sm" onclick="fillName('Orang Baik')">Orang Baik</button>
+                                </div>
+                            </div>
+                            <!-- Nominal Donasi -->
+                            <div class="form-group mb-3">
+                                <label for="nominal">Nominal Donasi</label>
+                                <input
+                                    id="nominal"
+                                    name="nominal_donasi"
+                                    type="number"
+                                    class="form-control"
+                                    placeholder="Pilih atau isi nominal donasi"
+                                    required
+                                >
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(10000)">Rp 10.000</button>
+                                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(20000)">Rp 20.000</button>
+                                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(50000)">Rp 50.000</button>
+                                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(100000)">Rp 100.000</button>
+                                </div>
+                            </div>
+                            <!-- Tombol Submit -->
+                            <br>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-light m-1">Konfirmasi Donasi</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-              </article>
-            </section>
-          </div>
-          <!-- End Blog Details Section -->
-
-          <!-- Donation Form Section -->
-          <div class="col-lg-6 sidebar">
-            <div class="widgets-container">
-              <h4 class="mb-3">Berdonasi</h4>
-              <p class="mb-4">Silahkan isi form di bawah ini untuk melakukan donasi</p>
-
-              <form action="donation-handler-url" method="POST">
-                <div class="form-group mb-3">
-                  <input name="name" type="text" class="form-control" placeholder="Nama*" required>
-                </div>
-                <div class="form-group mb-3">
-                  <input name="amount" type="number" class="form-control" placeholder="Nominal Donasi" required>
-                </div>
-                <div class="text-center">
-                  <button type="submit" class="btn btn-primary">Konfirmasi Donasi</button>
-                </div>
-              </form>
+                <!-- End Form Donasi -->
             </div>
-          </div>
-          <!-- End Donation Form Section -->
         </div>
-      </div>
-
-      </div>
     </div>
+</main>
+@endforeach
 
-  </main>
+<script>
+    function fillName(nama) {
+        document.getElementById('nama').value = nama;
+    }
+    function fillAmount(amount) {
+        document.getElementById('nominal').value = amount;
+    }
+</script>
+@endsection

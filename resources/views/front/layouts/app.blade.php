@@ -41,9 +41,9 @@
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
-      <a href="index.html" class="logo d-flex align-items-center me-auto">
+      <a href="{{ route('beranda') }}#hero" class="logo d-flex align-items-center me-auto">
         <!-- Uncomment the line below if you also wish to use an image logo -->
-        <img src="{{asset('front')}}/assets/img/logo.png" alt="">
+        <img src="{{asset('front')}}/assets/img/bs-logo.png" alt="">
         <h1 class="sitename">Bantu Sesama</h1>
       </a>
 

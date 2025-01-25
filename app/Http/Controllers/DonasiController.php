@@ -14,11 +14,11 @@ class DonasiController extends Controller
      */
     public function index()
     {
-        $donasi = Donasi::join('kampanye', 'kampanye_id', '=', 'kampanye.id')
-        ->select('donasi.*', 'kampanye.nama as kampanye')
-        ->get();
-        // $donasi = DB::table('donasi')->get();
-        return view ('admin.donasi.index', compact('donasi'));
+        // $donasi = Donasi::join('kampanye', 'kampanye_id', '=', 'kampanye.id')
+        // ->select('donasi.*', 'kampanye.nama as kampanye')
+        // ->get();
+        // // $donasi = DB::table('donasi')->get();
+        // return view ('admin.dashboard', compact('donasi'));
     }
 
     /**
@@ -26,7 +26,8 @@ class DonasiController extends Controller
      */
     public function create()
     {
-        //
+        // $kampanye = DB::table('kampanye')->get();
+        // return view('front.layouts.form-donasi', compact('kampanye'));
     }
 
     /**
@@ -34,7 +35,34 @@ class DonasiController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Ambil kampanye berdasarkan ID
+    $kampanye = DB::table('kampanye')->where('id', $request->kampanye_id)->first();
+
+    if (!$kampanye) {
+        return back()->with('error', 'Kampanye tidak ditemukan.');
+    }
+        // Hitung sisa target donasi
+    $sisaTarget = $kampanye->batas_nominal - $kampanye->dana_terkumpul;
+
+    // Validasi apakah nominal donasi melebihi batas
+    if ($request->nominal_donasi > $sisaTarget) {
+        return back()->with('error', 'Nominal donasi melebihi target yang dibutuhkan. Sisa target: Rp ' . number_format($sisaTarget, 0, ',', '.'));
+    }
+
+        //Tambah Donasi
+         DB::table('donasi')->insert([
+        'kampanye_id' => $request->kampanye_id,
+        'nama_donatur' => $request->nama_donatur,
+        'nominal_donasi' => $request->nominal_donasi,
+        'waktu_donasi' => now(),
+    ]);
+
+    // Mengupdate total dana_terkumpul
+    DB::table('kampanye')
+    ->where('id', $request->kampanye_id)
+    ->increment('dana_terkumpul', $request->nominal_donasi);
+
+    return redirect()->route('beranda')->with('success', 'Terima kasih atas donasi Anda!');
     }
 
     /**
