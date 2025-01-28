@@ -38,7 +38,7 @@
                 </tr>
               </thead>
               <tbody>
-                @foreach ($kampanye as $k)
+                @foreach ($aktifKampanye as $k)
                 <tr>
                   <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-0">{{$loop->iteration}}</h6></td>

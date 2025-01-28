@@ -52,7 +52,7 @@
                       </div>
                   </td>
                   <td class="border-bottom-0">
-                    <a href=""><i class="fa-solid fa-eye fa-xl" style="color: #0058f0;"></i></a>
+                    <a href="{{ route('pantau-donasi.create', $kampanye->id) }}" class="btn btn-warning m-1" ><i class="fa-solid fa-circle-check"></i> Salurkan</a>
                   </td>
                 </tr>
                 @endforeach

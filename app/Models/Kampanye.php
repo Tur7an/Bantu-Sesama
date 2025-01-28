@@ -18,14 +18,19 @@ class Kampanye extends Model
         return $this->hasMany(Donasi::class);
     }
 
-    // Di dalam Model Kampanye
-public function scopeAktif($query)
-{
-    return $query->where('status', 'aktif');
-}
+    public function PantauDonasi()
+    {
+        return $this->hasMany(PantauDonasi::class, 'kampanye_id');
+    }
 
-public function scopeNonAktif($query)
-{
-    return $query->where('status', 'nonaktif');
-}
+    // Di dalam Model Kampanye
+    public function scopeAktif($query)
+    {
+        return $query->where('status', 'aktif');
+    }
+
+    public function scopeNonAktif($query)
+    {
+        return $query->where('status', 'nonaktif');
+    }
 }

@@ -12,6 +12,16 @@
               <br>
               <h1>Pantau Donasi</h1>
               <p class="mb-0">Pantau Setiap Penyaluran Dana Donasi Pada Halaman Ini</p>
+              <div class="col-lg-12 text-center mb-4">
+                <div class="d-flex align-items-center justify-content-center gap-3">
+                  <label class="switch">
+                    <input type="checkbox" id="toggleSwitch" checked>
+                    <span class="slider"></span>
+                  </label>
+                  <p id="switchLabel" class="mb-0">Tersalurkan</p>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -26,132 +36,163 @@
       </nav>
     </div><!-- End Page Title -->
 
-    <div class="container">
-      <div class="row">
-
-        <div class="col-lg-12">
-
-              <!-- Recent Posts Section -->
     <section id="recent-posts" class="recent-posts section">
-
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-      </div><!-- End Section Title -->
+      </div>
 
-      <div class="container">
-
+      {{-- Donasi Tersalurkan --}}
+      <div class="container" id="tersalurkanDiv">
         <div class="row gy-5">
+            <h2>Tersalurkan</h2>
+            @foreach ($pantauDonasi  as $pantau)
+              <div class="col-xl-4 col-md-6">
+                <div class="post-item position-relative h-100" data-aos="fade-up" data-aos-delay="100">
+                  <div class="post-img position-relative overflow-hidden">
+                    <img src="{{ url('admin/assets/images/kampanye') }}/{{ $pantau->foto }}" class="img-fluid" alt="">
+                    <span class="post-date">Sudah Tersalurkan</span>
+                  </div>
 
-          <div class="col-xl-4 col-md-6">
-            <div class="post-item position-relative h-100" data-aos="fade-up" data-aos-delay="100">
-
-              <div class="post-img position-relative overflow-hidden">
-                <img src="{{asset('front')}}/assets/img/blog/blog-1.jpg" class="img-fluid" alt="">
-                <span class="post-date">December 12</span>
-              </div>
-
-              <div class="post-content d-flex flex-column">
-
-                <h3 class="post-title">Eum ad dolor et. Autem aut fugiat debitis</h3>
-
-                <div class="meta d-flex align-items-center">
+                  <div class="post-content d-flex flex-column">
+                    <h3 class="post-title">{{ $pantau->nama }}</h3>
+                    <hr>
+                    <a href="{{ route('detail-pantau') }}" class="readmore stretched-link"><span>Detail</span><i class="bi bi-arrow-right"></i></a>
+                  </div>
                 </div>
-
-                <hr>
-
-                <a href="{{ route('detail-pantau') }}" class="readmore stretched-link"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-
-              </div>
-
-            </div>
-          </div><!-- End post item -->
-
-          <div class="col-xl-4 col-md-6">
-            <div class="post-item position-relative h-100" data-aos="fade-up" data-aos-delay="200">
-
-              <div class="post-img position-relative overflow-hidden">
-                <img src="{{asset('front')}}/assets/img/blog/blog-2.jpg" class="img-fluid" alt="">
-                <span class="post-date">July 17</span>
-              </div>
-
-              <div class="post-content d-flex flex-column">
-
-                <h3 class="post-title">Et repellendus molestiae qui est sed omnis</h3>
-
-                <div class="meta d-flex align-items-center">
-                </div>
-
-                <hr>
-
-                <a href="{{ route('detail-pantau') }}" class="readmore stretched-link"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-
-              </div>
-
-            </div>
-          </div><!-- End post item -->
-
-          <div class="col-xl-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-            <div class="post-item position-relative h-100">
-
-              <div class="post-img position-relative overflow-hidden">
-                <img src="{{asset('front')}}/assets/img/blog/blog-3.jpg" class="img-fluid" alt="">
-                <span class="post-date">September 05</span>
-              </div>
-
-              <div class="post-content d-flex flex-column">
-
-                <h3 class="post-title">Quia assumenda est et veritati tirana ploder</h3>
-
-                <div class="meta d-flex align-items-center">
-                </div>
-
-                <hr>
-
-                <a href="{{ route('detail-pantau') }}" class="readmore stretched-link"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
-
-              </div>
-
-            </div>
-          </div><!-- End post item -->
-
+              </div><!-- End post item -->
+            @endforeach
         </div>
+      </div>
 
+      {{-- Donasi Belum Tersalurkan --}}
+      <div class="container" id="belumTersalurkanDiv" style="display: none;">
+        <div class="row gy-5">
+            <h2>Belum Tersalurkan</h2>
+            @foreach ($kampanyeNonaktif as $kampanye)
+              <div class="col-xl-4 col-md-6">
+                <div class="post-item position-relative h-100" data-aos="fade-up" data-aos-delay="100">
+                  <div class="post-img position-relative overflow-hidden">
+                    <img src="{{ url('admin/assets/images/kampanye') }}/{{ $kampanye->foto }}" class="img-fluid" alt="">
+                    <span class="post-date">Belum Tersalurkan</span>
+                  </div>
+
+                  <div class="post-content d-flex flex-column">
+                    <h3 class="post-title">{{ $kampanye->nama }}</h3>
+                    <li class="list-inline-item">
+                      <span><b>Terkumpul:</b> Rp.{{ number_format($kampanye->dana_terkumpul, 0, ',', '.') }}</span>
+                      <span><b>Dari:</b> Rp.{{ number_format($kampanye->batas_nominal, 0, ',', '.') }}</span>
+                      <div class="progress" style="height: 15px;">
+                          @php
+                          $percentage = ($kampanye->dana_terkumpul / $kampanye->batas_nominal) * 100;
+                          @endphp
+                          <div class="progress-bar bg-primary" role="progressbar"
+                              style="width: {{ $percentage > 100 ? 100 : $percentage }}%;"
+                              aria-valuenow="{{ $percentage }}"
+                              aria-valuemin="0"
+                              aria-valuemax="100">
+                              {{ round($percentage, 2) }}%
+                          </div>
+                      </div>
+                    </li>
+                    <hr>
+                    <a href="{{ route('detail-pantau') }}" class="readmore stretched-link"><span>Detail</span><i class="bi bi-arrow-right"></i></a>
+                  </div>
+                </div>
+              </div><!-- End post item -->
+            @endforeach
+        </div>
       </div>
 
     </section><!-- /Recent Posts Section -->
 
-            </div>
+</main>
 
-          </section><!-- /Blog Posts Section -->
+<style>
+    .d-flex {
+      margin-top: 1rem;
+    }
 
-          <!-- Blog Pagination Section -->
-          <section id="blog-pagination" class="blog-pagination section">
+    .gap-3 {
+      gap: 1rem;
+    }
 
-            <div class="container">
-              <div class="d-flex justify-content-center">
-                <ul>
-                  <li><a href="#"><i class="bi bi-chevron-left"></i></a></li>
-                  <li><a href="#">1</a></li>
-                  <li><a href="#" class="active">2</a></li>
-                  <li><a href="#">3</a></li>
-                  <li><a href="#">4</a></li>
-                  <li>...</li>
-                  <li><a href="#">10</a></li>
-                  <li><a href="#"><i class="bi bi-chevron-right"></i></a></li>
-                </ul>
-              </div>
-            </div>
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
 
-          </section><!-- /Blog Pagination Section -->
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
 
-        </div>
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
 
-          </div>
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      border-radius: 50%;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+    }
 
-        </div>
+    input:checked + .slider {
+      background-color: #4CAF50;
+    }
 
-      </div>
-    </div>
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
 
-  </main>
+    #switchLabel {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+</style>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggleSwitch = document.getElementById('toggleSwitch');
+    const tersalurkanDiv = document.getElementById('tersalurkanDiv');
+    const belumTersalurkanDiv = document.getElementById('belumTersalurkanDiv');
+    const switchLabel = document.getElementById('switchLabel');
+
+    toggleSwitch.addEventListener('change', function() {
+      if (toggleSwitch.checked) {
+        tersalurkanDiv.style.display = 'block';
+        belumTersalurkanDiv.style.display = 'none';
+        switchLabel.textContent = 'Tersalurkan';
+      } else {
+        belumTersalurkanDiv.style.display = 'block';
+        tersalurkanDiv.style.display = 'none';
+        switchLabel.textContent = 'Belum Tersalurkan';
+      }
+    });
+
+    if (toggleSwitch.checked) {
+      tersalurkanDiv.style.display = 'block';
+      belumTersalurkanDiv.style.display = 'none';
+    } else {
+      tersalurkanDiv.style.display = 'none';
+      belumTersalurkanDiv.style.display = 'block';
+    }
+  });
+</script>
+@endsection

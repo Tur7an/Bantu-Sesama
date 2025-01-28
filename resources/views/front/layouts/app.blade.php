@@ -51,7 +51,7 @@
         <ul>
             <li><a href="{{ route('beranda') }}#hero">Beranda</a></li>
           <li><a href="{{ route('beranda') }}#donasi">Donasi</a></li>
-          <li><a href="{{ route('pantau-donasi') }}">Pantau Donasi</a></li>
+          <li><a href="{{ route('pantau') }}">Pantau Donasi</a></li>
           <li><a href="{{ route('tentang-kami') }}">Tentang Kami</a></li>
           <li><a href="{{ route('beranda') }}#kontak">Kontak</a></li>
           @guest

@@ -11,12 +11,13 @@ use App\Http\Controllers\PantauDonasiController;
 
 // Routing Landing Page
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
+Route::get('/pantau-donasi', [BerandaController::class, 'indexPantau'])->name('pantau');
 Route::get('/form-donasi/{id}', [BerandaController::class, 'detail']);
 Route::resource('donasi', DonasiController::class);
 
-Route::get('/pantau-donasi', function () {
-    return view('front.layouts.pantau');
-})->name('pantau-donasi');
+// Route::get('/pantau-donasi', function () {
+//     return view('front.layouts.pantau');
+// })->name('pantau-home');
 
 Route::get('/tentang-kami', function () {
     return view('front.layouts.tentang');
@@ -44,7 +45,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/laporan', [LaporanController::class, 'index']);
         Route::get('/detail-laporan/{id}', [LaporanController::class, 'show'])->name('detail-laporan');
         Route::get('/laporan-pdf', [LaporanController::class, 'eksporPdf'])->name('laporan.pdf');
-        Route::get('/pantau-donasi', [PantauDonasiController::class, 'pantauDonasi'])->name('pantau-donasi');
+        Route::get('/pantau-donasi', [PantauDonasiController::class, 'index'])->name('pantau-donasi');
+        Route::get('pantau-donasi/{kampanye_id}/create', [PantauDonasiController::class, 'create'])->name('pantau-donasi.create');
+        Route::post('pantau-donasi', [PantauDonasiController::class, 'store'])->name('pantau-donasi.store');
     });
 });
 

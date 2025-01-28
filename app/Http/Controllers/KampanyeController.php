@@ -13,8 +13,9 @@ class KampanyeController extends Controller
      */
     public function index()
     {
-        $kampanye = DB::table('kampanye')->get();
-        return view ('admin.kampanye.index', compact('kampanye'));
+        // Ambil kampanye dengan status aktif
+        $aktifKampanye = Kampanye::where('status', 'aktif')->get();
+        return view('admin.kampanye.index', compact('aktifKampanye'));
     }
 
     /**
