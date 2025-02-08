@@ -34,7 +34,7 @@
                 </tr>
               </thead>
               <tbody>
-                @foreach ($nonAktifKampanye as $kampanye)
+                @foreach ($pantauKampanye as $kampanye)
                 <tr>
                   <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-0">{{$loop->iteration}}</h6></td>
@@ -46,14 +46,25 @@
                     <h6 class="fw-semibold mb-0"></h6>{{$kampanye->batas_tanggal}}</td>
                   <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-0"></h6>Rp.{{ number_format($kampanye->batas_nominal, 0, ',', '.') }}</td>
-                  <td class="border-bottom-0">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-danger rounded-3 fw-semibold">{{$kampanye->status}}</span>
-                      </div>
-                  </td>
-                  <td class="border-bottom-0">
-                    <a href="{{ route('pantau-donasi.create', $kampanye->id) }}" class="btn btn-warning m-1" ><i class="fa-solid fa-circle-check"></i> Salurkan</a>
-                  </td>
+                    <td class="border-bottom-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge {{ $kampanye->status == 'selesai' ? 'bg-success' : 'bg-danger' }} rounded-3 fw-semibold">
+                                {{ $kampanye->status }}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="border-bottom-0">
+                        @if ($kampanye->status == 'nonaktif')
+                            <a href="{{ route('pantau-donasi.create', $kampanye->id) }}" class="btn btn-warning m-1">
+                                <i class="fa-solid fa-circle-check"></i> Salurkan
+                            </a>
+                        @elseif ($kampanye->status == 'selesai')
+                            <a href="" class="btn btn-info m-1">
+                                <i class="fa-solid fa-eye"></i> Lihat Detail
+                            </a>
+                           <!-- Optional: You can add another button for other statuses -->
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
 

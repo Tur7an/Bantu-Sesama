@@ -14,28 +14,15 @@ Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 Route::get('/pantau-donasi', [BerandaController::class, 'indexPantau'])->name('pantau');
 Route::get('/form-donasi/{id}', [BerandaController::class, 'detail']);
 Route::resource('donasi', DonasiController::class);
-
-// Route::get('/pantau-donasi', function () {
-//     return view('front.layouts.pantau');
-// })->name('pantau-home');
-
-Route::get('/tentang-kami', function () {
-    return view('front.layouts.tentang');
-})->name('tentang-kami');
-
-Route::get('/detail-pantau', function () {
-    return view('front.layouts.detail-pantau');
-})->name('detail-pantau');
-
-Route::get('/form-donasi', function () {
-    return view('front.layouts.form-donasi');
-})->name('form-donasi');
+Route::get('/tentang-kami', function () {return view('front.layouts.tentang');})->name('tentang-kami');
+Route::get('/konfirmasi-donasi', function () {return view('front.layouts.konfirmasi-donasi');})->name('konfirmasi-donasi');
+Route::get('/pantau-donasi/{id}', [BerandaController::class, 'detailPantau'])->name('detail-pantau');
+Route::get('/form-donasi', function () {return view('front.layouts.form-donasi');})->name('form-donasi');
 
 // Middleware untuk Routing Dashboard
 Route::group(['middleware' => ['auth']], function () {
-    // Dashboard utama
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // Prefix admin untuk routing admin
     Route::prefix('admin')->group(function () {
         Route::resource('kampanye', KampanyeController::class);
@@ -47,10 +34,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/laporan-pdf', [LaporanController::class, 'eksporPdf'])->name('laporan.pdf');
         Route::get('/pantau-donasi', [PantauDonasiController::class, 'index'])->name('pantau-donasi');
         Route::get('pantau-donasi/{kampanye_id}/create', [PantauDonasiController::class, 'create'])->name('pantau-donasi.create');
-        Route::post('pantau-donasi', [PantauDonasiController::class, 'store'])->name('pantau-donasi.store');
+        Route::post('/pantau-donasi/store', [PantauDonasiController::class, 'store'])->name('pantau-donasi.store');
     });
 });
 
 Auth::routes();
-
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

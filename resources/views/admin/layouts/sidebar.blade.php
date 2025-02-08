@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard Admin</title>
-  <link rel="shortcut icon" type="image/png" href="{{asset('admin')}}/assets/images/logos/bs-logo.png" />
+  <link rel="shortcut icon" type="image/png" href="{{asset('admin')}}/assets/images/logos/LogoIconBiru.png" />
   <link rel="stylesheet" href="{{asset('admin')}}/assets/css/styles.min.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
 </head>
@@ -15,12 +15,12 @@
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
     <!-- Sidebar Start -->
-    <aside class="left-sidebar">
+    <aside class="left-sidebar"><br>
       <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
           <a href="{{ route('beranda') }}#hero" class="text-nowrap logo-img">
-            <img src="{{asset('admin')}}/assets/images/logos/bs-logo.png" width="180" alt="" />
+            <img src="{{asset('admin')}}/assets/images/logos/LogoBiru.png" width="200" alt="" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-8"></i>

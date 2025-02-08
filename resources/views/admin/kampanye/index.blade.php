@@ -21,13 +21,13 @@
                     <h6 class="fw-semibold mb-0">Nama</h6>
                   </th>
                   <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Deskripsi</h6>
+                    <h6 class="fw-semibold mb-0">Dana Terkumpul</h6>
                   </th>
                   <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Batas Nominal</h6>
+                    <h6 class="fw-semibold mb-0">Target Donasi</h6>
                   </th>
                   <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Batas Tanggal</h6>
+                    <h6 class="fw-semibold mb-0">Batas Akhir</h6>
                   </th>
                   <th class="border-bottom-0">
                     <h6 class="fw-semibold mb-0">Status</h6>
@@ -45,10 +45,10 @@
                   <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-0">{{$k->nama}}</h6></td>
                   <td class="border-bottom-0">
-                    <p class="mb-0 fw-normal">{{$k->deskripsi}}</p>
+                    <h6 class="fw-semibold mb-0 fs-4">Rp.{{ number_format($k->dana_terkumpul, 0, ',', '.') }}</h6>
                   </td>
                   <td class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0 fs-4">Rp{{ number_format($k->batas_nominal, 0, ',', '.') }}</h6>
+                    <h6 class="fw-semibold mb-0 fs-4">Rp.{{ number_format($k->batas_nominal, 0, ',', '.') }}</h6>
                   </td>
                   <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-0 fs-4">{{$k->batas_tanggal}}</h6>

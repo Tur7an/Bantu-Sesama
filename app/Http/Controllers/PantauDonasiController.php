@@ -5,15 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Kampanye;
 use App\Models\PantauDonasi;
+use Illuminate\Support\Carbon;
 use DB;
 
 class PantauDonasiController extends Controller
 {
+
     public function index()
     {
-        // Ambil kampanye dengan status non-aktif
-        $nonAktifKampanye = Kampanye::where('status', 'nonaktif')->get();
-        return view('admin.pantau-donasi.index', compact('nonAktifKampanye'));
+        $pantauKampanye = Kampanye::whereIn('status', ['nonaktif', 'selesai'])
+            ->get()
+            ->map(function ($tanggal) {
+                $tanggal->batas_tanggal = Carbon::parse($tanggal->batas_tanggal)
+                    ->locale('id')
+                    ->isoFormat('D MMMM YYYY');
+                return $tanggal;
+            });
+        return view('admin.pantau-donasi.index', compact('pantauKampanye'));
     }
 
     public function create($kampanye_id)
@@ -24,33 +32,27 @@ class PantauDonasiController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi form input
         $request->validate([
-            'img' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'tgl_penyaluran' => 'required|date',
-            'deskripsi' => 'required|string|max:255',
             'kampanye_id' => 'required|exists:kampanye,id',
+            'tgl_penyaluran' => 'required|date',
+            'deskripsi' => 'required',
+            'foto_penyaluran' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Menyimpan data pantau donasi ke tabel pantau_donasi
-        $pantauDonasi = new PantauDonasi();
-        $pantauDonasi->kampanye_id = $request->kampanye_id;
-        $pantauDonasi->tgl_penyaluran = $request->tgl_penyaluran;
-        $pantauDonasi->deskripsi = $request->deskripsi;
+        $filename = 'pantau-' . uniqid() . '.' . $request->foto_penyaluran->extension();
+        $request->foto_penyaluran->move(public_path('admin/assets/images/pantauDonasi'), $filename);
 
-        // Menyimpan foto penyaluran jika ada
-        if ($request->hasFile('img')) {
-            $imagePath = $request->file('img')->store('pantau_donasi_images');
-            $pantauDonasi->img = $imagePath;
-        }
+        DB::table('pantau_donasi')->insert([
+            'kampanye_id' => $request->kampanye_id,
+            'tgl_penyaluran' => $request->tgl_penyaluran,
+            'deskripsi' => $request->deskripsi,
+            'foto_penyaluran' => $filename,
+        ]);
 
-        $pantauDonasi->save();
+        DB::table('kampanye')
+            ->where('id', $request->kampanye_id)
+            ->update(['status' => 'selesai']);
 
-        // Update status kampanye menjadi non-aktif
-        $kampanye = Kampanye::find($request->kampanye_id);
-        $kampanye->status = 'non-aktif';
-        $kampanye->save();
-
-        return redirect()->route('pantau-donasi.index')->with('success', 'Pantau Donasi berhasil ditambahkan!');
+        return redirect()->route('pantau-donasi')->with('success', 'Penyaluran donasi berhasil ditambahkan.');
     }
 }

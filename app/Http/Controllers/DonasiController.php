@@ -6,94 +6,85 @@ use Illuminate\Http\Request;
 use App\Models\Donasi;
 use App\Models\Kampanye;
 use DB;
+use Illuminate\Support\Carbon;
 
 class DonasiController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        // $donasi = Donasi::join('kampanye', 'kampanye_id', '=', 'kampanye.id')
-        // ->select('donasi.*', 'kampanye.nama as kampanye')
-        // ->get();
-        // // $donasi = DB::table('donasi')->get();
-        // return view ('admin.dashboard', compact('donasi'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // $kampanye = DB::table('kampanye')->get();
-        // return view('front.layouts.form-donasi', compact('kampanye'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
-    {
-        // Ambil kampanye berdasarkan ID
-    $kampanye = DB::table('kampanye')->where('id', $request->kampanye_id)->first();
+{
+    // Validasi request
+    $request->validate([
+        'kampanye_id' => 'required|exists:kampanye,id',
+        'nama_donatur' => 'required|string|max:255',
+        'nominal_donasi' => 'required|numeric|min:1000',
+    ]);
 
-    if (!$kampanye) {
-        return back()->with('error', 'Kampanye tidak ditemukan.');
+    // Ambil data kampanye
+    $kampanye = DB::table('kampanye')->where('id', $request->kampanye_id)->firstOrFail();
+
+    // Cek apakah kampanye sudah nonaktif
+    if ($kampanye->status !== 'aktif') {
+        return back()->with('error', 'Kampanye sudah tidak menerima donasi.');
     }
-        // Hitung sisa target donasi
+
+    // Hitung sisa target donasi
     $sisaTarget = $kampanye->batas_nominal - $kampanye->dana_terkumpul;
 
-    // Validasi apakah nominal donasi melebihi batas
     if ($request->nominal_donasi > $sisaTarget) {
         return back()->with('error', 'Nominal donasi melebihi target yang dibutuhkan. Sisa target: Rp ' . number_format($sisaTarget, 0, ',', '.'));
     }
 
-        //Tambah Donasi
-         DB::table('donasi')->insert([
-        'kampanye_id' => $request->kampanye_id,
-        'nama_donatur' => $request->nama_donatur,
-        'nominal_donasi' => $request->nominal_donasi,
-        'waktu_donasi' => now(),
-    ]);
+    try {
+        DB::beginTransaction();
 
-    // Mengupdate total dana_terkumpul
-    DB::table('kampanye')
-    ->where('id', $request->kampanye_id)
-    ->increment('dana_terkumpul', $request->nominal_donasi);
+        // Simpan donasi
+        DB::table('donasi')->insert([
+            'kampanye_id' => $request->kampanye_id,
+            'nama_donatur' => $request->nama_donatur,
+            'nominal_donasi' => $request->nominal_donasi,
+            'waktu_donasi' => Carbon::now('Asia/Jakarta'),
+        ]);
 
-    return redirect()->route('beranda')->with('success', 'Terima kasih atas donasi Anda!');
+        // Update dana terkumpul pada kampanye
+        DB::table('kampanye')->where('id', $request->kampanye_id)->update([
+            'dana_terkumpul' => $kampanye->dana_terkumpul + $request->nominal_donasi,
+        ]);
+
+        // Update status kampanye jika target tercapai
+        $this->updateStatusKampanye($kampanye->id);
+
+        DB::commit();
+
+        return back()->with('success', 'Terima kasih atas donasi Anda!');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');
     }
+}
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    private function updateStatusKampanye($kampanye_id)
     {
-        //
-    }
+        $now = Carbon::now('Asia/Jakarta');
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        // Ambil data kampanye terbaru setelah update dana terkumpul
+        $kampanye = DB::table('kampanye')->where('id', $kampanye_id)->first();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        if ($kampanye) {
+            // Jika batas tanggal sudah lewat, ubah status ke nonaktif
+            if ($kampanye->batas_tanggal < $now && $kampanye->status == 'aktif') {
+                DB::table('kampanye')
+                    ->where('id', $kampanye_id)
+                    ->update(['status' => 'nonaktif']);
+            }
+
+            // Jika total donasi mencapai atau melebihi batas nominal, ubah status ke nonaktif
+            if ($kampanye->dana_terkumpul >= $kampanye->batas_nominal && $kampanye->status == 'aktif') {
+                DB::table('kampanye')
+                    ->where('id', $kampanye_id)
+                    ->update(['status' => 'nonaktif']);
+            }
+        }
     }
 }

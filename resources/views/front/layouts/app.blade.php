@@ -9,8 +9,8 @@
   <meta name="keywords" content="">
 
   <!-- Favicons -->
-  <link href="{{asset('front')}}/assets/img/favicon.png" rel="icon">
-  <link href="{{asset('front')}}/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="{{asset('front')}}/assets/img/logo/LogoIconBiru.png" rel="icon">
+  <link href="{{asset('front')}}/assets/img/logo/LogoIconBiru.png" rel="apple-touch-icon">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -26,14 +26,6 @@
 
   <!-- Main CSS File -->
   <link href="{{asset('front')}}/assets/css/main.css" rel="stylesheet">
-
-  <!-- =======================================================
-  * Template Name: FlexStart
-  * Template URL: https://bootstrapmade.com/flexstart-bootstrap-startup-template/
-  * Updated: Nov 01 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
 </head>
 
 <body class="index-page">
@@ -42,9 +34,7 @@
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
       <a href="{{ route('beranda') }}#hero" class="logo d-flex align-items-center me-auto">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <img src="{{asset('front')}}/assets/img/bs-logo.png" alt="">
-        <h1 class="sitename">Bantu Sesama</h1>
+        <img src="{{asset('front')}}/assets/img/logo/LogoBiru.png" alt="">
       </a>
 
       <nav id="navmenu" class="navmenu">
@@ -62,10 +52,7 @@
                             {{ Auth::user()->name }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <!-- Tombol Dashboard -->
                             <a class="dropdown-item" href="{{ url('/dashboard') }}">Dashboard</a>
-
-                            <!-- Tombol Logout -->
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
                                          document.getElementById('logout-form').submit();">
@@ -87,14 +74,9 @@
   @yield('content');
 
   <footer id="footer" class="footer">
-
     <div class="container copyright text-center mt-4">
       <p>© <span>Copyright</span> <strong class="px-1 sitename">Bantu Sesama</strong> <span>All Rights Reserved</span></p>
-      <!-- <div class="credits">
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> Distributed by <a href=“https://themewagon.com>ThemeWagon
-      </div> -->
     </div>
-
   </footer>
 
   <!-- Scroll Top -->

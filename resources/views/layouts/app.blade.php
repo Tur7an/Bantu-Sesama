@@ -4,18 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <link rel="shortcut icon" type="image/png" href="{{asset('admin')}}/assets/images/logos/LogoIconBiru.png" />
+    <link rel="stylesheet" href="{{asset('admin')}}/assets/css/styles.min.css" />
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>{{ config('app.name', 'BantuSesama') }}</title>
-
-    <!-- Fonts -->
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
-
-    <!-- Custom CSS -->
     <style>
-        /* Global styles */
         body {
             font-family: 'Nunito', sans-serif;
             margin: 0;
@@ -120,7 +115,7 @@
     <div id="app">
         <nav class="navbar">
             <a class="navbar-brand" href="{{ url('/') }}">
-                {{ config('app.name', 'BantuSesama') }}
+                <img src="{{asset('admin')}}/assets/images/logos/LogoBiru.png" height="30">
             </a>
             <button class="navbar-toggler" type="button">
                 ☰
@@ -130,12 +125,6 @@
                 @if (Route::has('login'))
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                </li>
-                @endif
-
-                @if (Route::has('register'))
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                 </li>
                 @endif
                 @else

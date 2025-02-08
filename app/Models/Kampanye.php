@@ -33,4 +33,9 @@ class Kampanye extends Model
     {
         return $query->where('status', 'nonaktif');
     }
+
+    public function scopeSelesai($query)
+    {
+        return $query->where('status', 'selesai');
+    }
 }

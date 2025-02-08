@@ -35,7 +35,10 @@
                     <h6 class="fw-semibold mb-0">{{$k->nama}}</h6></td>
                   <td class="border-bottom-0">
                     <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-success rounded-3 fw-semibold">{{$k->status}}</span>
+                        <span class="badge
+                            {{ $k->status == 'selesai' ? 'bg-success' :
+                            ($k->status == 'nonaktif' ? 'bg-danger' : 'bg-primary') }}
+                        rounded-3 fw-semibold">{{$k->status}}</span>
                       </div>
                   </td>
                   <td class="border-bottom-0">

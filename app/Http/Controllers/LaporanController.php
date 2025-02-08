@@ -21,104 +21,105 @@ class LaporanController extends Controller
     {
         $kampanye = DB::table('kampanye')
         ->where('kampanye.id', $id)
-        ->get();
+        ->get()
+        ->map(function ($tanggal) {
+            $tanggal->batas_tanggal = Carbon::parse($tanggal->batas_tanggal)
+                ->locale('id')
+                ->isoFormat('D MMMM YYYY');
+            return $tanggal;
+        });
         return view('admin.laporan.detail-laporan', compact('kampanye'));
     }
 
     public function eksporPdf()
-{
-    // Ambil data kampanye
-    $kampanye = Kampanye::all(); // Sesuaikan query dengan kebutuhan
+    {
+        $kampanye = Kampanye::all();
 
-    // Ambil tanggal dan waktu sekarang
-    $currentDateTime = Carbon::now('Asia/Jakarta')->format('d-m-Y H:i:s');
+        $currentDateTime = Carbon::now('Asia/Jakarta')->format('d-m-Y H:i:s');
 
-    // Format data menjadi tabel PDF dengan kop surat dan styling
-    $html = '
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            color: #333;
-        }
-        .kop-surat {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .kop-surat h1 {
-            margin: 0;
-            font-size: 18px;
-        }
-        .kop-surat p {
-            margin: 0;
-            font-size: 14px;
-            color: #555;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid #999;
-        }
-        th {
-            background-color: #f2f2f2;
-            color: #000;
-            text-align: center;
-            font-weight: bold;
-        }
-        td {
-            text-align: center;
-            padding: 8px;
-        }
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-        }
-    </style>
-    <div class="kop-surat">
-        <h1>Bantu Sesama</h1>
-        <p>Alamat: Kota Bengkulu, Indonesia</p>
-        <p>Telepon: +628 123 456 789 | Email: bantusesama@example.com</p>
-    </div>
-    <h2 style="text-align: center;">Laporan Kampanye Donasi</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Nama Kampanye</th>
-                <th>Dana Terkumpul</th>
-                <th>Batas Tanggal</th>
-                <th>Target Dana</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>';
+        $html = '
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                color: #333;
+            }
+            .kop-surat {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .kop-surat h1 {
+                margin: 0;
+                font-size: 18px;
+            }
+            .kop-surat p {
+                margin: 0;
+                font-size: 14px;
+                color: #555;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            table, th, td {
+                border: 1px solid #999;
+            }
+            th {
+                background-color: #f2f2f2;
+                color: #000;
+                text-align: center;
+                font-weight: bold;
+            }
+            td {
+                text-align: center;
+                padding: 8px;
+            }
+            .footer {
+                margin-top: 20px;
+                text-align: center;
+                font-size: 12px;
+                color: #666;
+            }
+        </style>
+        <div class="kop-surat">
+            <h1>Bantu Sesama</h1>
+            <p>Alamat: Kota Bengkulu, Indonesia</p>
+            <p>Telepon: +628 123 456 789 | Email: bantusesama@example.com</p>
+        </div>
+        <h2 style="text-align: center;">Laporan Kampanye Donasi</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Kampanye</th>
+                    <th>Dana Terkumpul</th>
+                    <th>Batas Tanggal</th>
+                    <th>Target Dana</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>';
 
-    foreach ($kampanye as $k) {
+        foreach ($kampanye as $k) {
+            $html .= '
+                <tr>
+                    <td>' . $k->nama . '</td>
+                    <td>Rp' . number_format($k->dana_terkumpul, 0, ',', '.') . '</td>
+                    <td>' . Carbon::parse($k->batas_tanggal)->locale('id')->isoFormat('D MMMM YYYY') . '</td>
+                    <td>Rp' . number_format($k->batas_nominal, 0, ',', '.') . '</td>
+                    <td>' . $k->status . '</td>
+                </tr>';
+        }
+
         $html .= '
-            <tr>
-                <td>' . $k->nama . '</td>
-                <td>Rp' . number_format($k->dana_terkumpul, 0, ',', '.') . '</td>
-                <td>' . $k->batas_tanggal . '</td>
-                <td>Rp' . number_format($k->batas_nominal, 0, ',', '.') . '</td>
-                <td>' . $k->status . '</td>
-            </tr>';
+            </tbody>
+        </table>
+        <div class="footer">
+            <p>Laporan ini dibuat secara otomatis oleh sistem.</p>
+            <p>Diunduh pada: ' . $currentDateTime . '</p>
+        </div>';
+
+        $pdf = Pdf::loadHTML($html);
+
+        $fileName = 'laporan-kampanye-' . Carbon::now('Asia/Jakarta')->format('Y-m-d-H-i-s') . '.pdf';
+        return $pdf->download($fileName);
     }
-
-    $html .= '
-        </tbody>
-    </table>
-    <div class="footer">
-        <p>Laporan ini dibuat secara otomatis oleh sistem.</p>
-        <p>Diunduh pada: ' . $currentDateTime . '</p>
-    </div>';
-
-    // Buat file PDF
-    $pdf = Pdf::loadHTML($html);
-
-    // Unduh file PDF dengan nama yang memuat waktu
-    $fileName = 'laporan-kampanye-' . Carbon::now('Asia/Jakarta')->format('Y-m-d-H-i-s') . '.pdf';
-    return $pdf->download($fileName);
-}
 }

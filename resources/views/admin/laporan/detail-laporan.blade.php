@@ -17,10 +17,10 @@
                     <h6 class="fw-semibold mb-0">Dana Terkumpul</h6>
                   </th>
                   <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Batas Tanggal Kampanye</h6>
+                    <h6 class="fw-semibold mb-0">Batas Akhir</h6>
                   </th>
                   <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Target Dana Donasi</h6>
+                    <h6 class="fw-semibold mb-0">Target Donasi</h6>
                   </th>
                   <th class="border-bottom-0">
                     <h6 class="fw-semibold mb-0">Status Kampanye</h6>
@@ -33,14 +33,17 @@
                   <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-0">{{$k->nama}}</h6></td>
                   <td class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">{{$k->dana_terkumpul}}</h6></td>
+                    <h6 class="fw-semibold mb-0">Rp.{{ number_format($k->dana_terkumpul, 0, ',', '.') }}</h6></td>
                   <td class="border-bottom-0">
                     <h6 class="fw-semibold mb-0">{{$k->batas_tanggal}}</h6></td>
                   <td class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">{{$k->batas_nominal}}</h6></td>
+                    <h6 class="fw-semibold mb-0">Rp.{{ number_format($k->batas_nominal, 0, ',', '.') }}</h6></td>
                   <td class="border-bottom-0">
                     <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-success rounded-3 fw-semibold">{{$k->status}}</span>
+                        <span class="badge
+                        {{ $k->status == 'selesai' ? 'bg-success' :
+                        ($k->status == 'nonaktif' ? 'bg-danger' : 'bg-primary') }}
+                        rounded-3 fw-semibold">{{$k->status}}</span>
                       </div>
                   </td>
                 </tr>

@@ -5,7 +5,7 @@
     <div class="container-fluid">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title fw-semibold mb-4">Form Tambah Kampanye</h5>
+          <h5 class="card-title fw-semibold mb-4">Form Edit Kampanye</h5>
           <div class="card">
             <div class="card-body">
                 @foreach ($kampanye as $k)

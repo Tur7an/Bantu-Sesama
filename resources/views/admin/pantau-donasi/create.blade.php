@@ -33,25 +33,33 @@
         </div>
           <div class="card">
             <div class="card-body">
-              <form action="{{ route('pantau-donasi.store') }}" method="POST" enctype="multipart/form-data">
-              @csrf
-                <div class="mb-3">
-                    <label for="tgl_penyaluran">Tanggal Penyaluran</label>
-                    <input type="date" name="tgl_penyaluran" id="tgl_penyaluran" class="form-control" required>
-                </div>
+                <form action="{{ route('pantau-donasi.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
 
-                <div class="mb-3">
-                    <label for="deskripsi">Deskripsi</label>
-                    <textarea name="deskripsi" id="deskripsi" class="form-control" required></textarea>
-                </div>
+                    <!-- Kampanye ID (Hidden) -->
+                    <input type="hidden" name="kampanye_id" value="{{ $kampanye->id }}">
 
-                <div class="mb-3">
-                    <label for="img">Foto Penyaluran</label>
-                    <input type="file" name="img" id="img" class="form-control" required>
-                </div>
+                    <!-- Tanggal Penyaluran -->
+                    <div class="mb-3">
+                        <label for="tgl_penyaluran" class="form-label">Tanggal Penyaluran</label>
+                        <input type="date" name="tgl_penyaluran" id="tgl_penyaluran" class="form-control" required>
+                    </div>
 
-                <button type="submit" class="btn btn-primary">Simpan</button>
-              </form>
+                    <!-- Deskripsi -->
+                    <div class="mb-3">
+                        <label for="deskripsi" class="form-label">Deskripsi</label>
+                        <textarea name="deskripsi" id="deskripsi" class="form-control" rows="4" required></textarea>
+                    </div>
+
+                    <!-- Upload Foto Penyaluran -->
+                    <div class="mb-3">
+                        <label for="foto_penyaluran" class="form-label">Foto Penyaluran</label>
+                        <input type="file" name="foto_penyaluran" id="foto_penyaluran" class="form-control" accept="image/jpeg,image/png,image/jpg" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </form>
+
             </div>
           </div>
         </div>

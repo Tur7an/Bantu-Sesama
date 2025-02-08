@@ -3,13 +3,12 @@
 
 @foreach ($kampanye as $k)
 
-
 <div class="container-fluid">
     <div class="card">
-        <div class="card-body">
+      <div class="card-body">
+        <h5 class="card-title fw-semibold mb-4">Detail Kampanye Donasi</h5>
             <!-- Link Font Awesome -->
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
-
             <div class="container">
                 <div class="row">
                     <!-- Column 1: Project Info -->
@@ -55,12 +54,12 @@
                             <div class="project-info-box">
                                 <div class="d-flex justify-content-between mb-1">
                                     <span><b>Terkumpul:</b> Rp{{ number_format($k->dana_terkumpul, 0, ',', '.') }} <b>Dari:</b> Rp{{ number_format($k->batas_nominal, 0, ',', '.') }} </span>
-                                </div>
+                                </div><br>
                                 <div class="progress" style="height: 20px;">
                                     @php
                                         $percentage = ($k->dana_terkumpul / $k->batas_nominal) * 100;
                                     @endphp
-                                    <div class="progress-bar bg-success" role="progressbar"
+                                    <div class="progress-bar bg-primary" role="progressbar"
                                          style="width: {{ $percentage }}%;"
                                          aria-valuenow="{{ $percentage }}"
                                          aria-valuemin="0"
