@@ -5,86 +5,87 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Donasi;
 use App\Models\Kampanye;
+use Midtrans\Config;
+use Midtrans\Snap;
 use DB;
 use Illuminate\Support\Carbon;
 
 class DonasiController extends Controller
 {
     public function store(Request $request)
-{
-    // Validasi request
-    $request->validate([
-        'kampanye_id' => 'required|exists:kampanye,id',
-        'nama_donatur' => 'required|string|max:255',
-        'nominal_donasi' => 'required|numeric|min:1000',
-    ]);
-
-    // Ambil data kampanye
-    $kampanye = DB::table('kampanye')->where('id', $request->kampanye_id)->firstOrFail();
-
-    // Cek apakah kampanye sudah nonaktif
-    if ($kampanye->status !== 'aktif') {
-        return back()->with('error', 'Kampanye sudah tidak menerima donasi.');
-    }
-
-    // Hitung sisa target donasi
-    $sisaTarget = $kampanye->batas_nominal - $kampanye->dana_terkumpul;
-
-    if ($request->nominal_donasi > $sisaTarget) {
-        return back()->with('error', 'Nominal donasi melebihi target yang dibutuhkan. Sisa target: Rp ' . number_format($sisaTarget, 0, ',', '.'));
-    }
-
-    try {
-        DB::beginTransaction();
-
-        // Simpan donasi
-        DB::table('donasi')->insert([
-            'kampanye_id' => $request->kampanye_id,
-            'nama_donatur' => $request->nama_donatur,
-            'nominal_donasi' => $request->nominal_donasi,
-            'waktu_donasi' => Carbon::now('Asia/Jakarta'),
-        ]);
-
-        // Update dana terkumpul pada kampanye
-        DB::table('kampanye')->where('id', $request->kampanye_id)->update([
-            'dana_terkumpul' => $kampanye->dana_terkumpul + $request->nominal_donasi,
-        ]);
-
-        // Update status kampanye jika target tercapai
-        $this->updateStatusKampanye($kampanye->id);
-
-        DB::commit();
-
-        return back()->with('success', 'Terima kasih atas donasi Anda!');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');
-    }
-}
-
-
-    private function updateStatusKampanye($kampanye_id)
     {
-        $now = Carbon::now('Asia/Jakarta');
+        // Validasi input
+        $request->validate([
+            'kampanye_id' => 'required|exists:kampanye,id',
+            'nama_donatur' => 'required|string|max:255',
+            'nominal_donasi' => 'required|numeric|min:1000',
+        ]);
+        $kampanye = DB::table('kampanye')->where('id', $request->kampanye_id)->first();
 
-        // Ambil data kampanye terbaru setelah update dana terkumpul
-        $kampanye = DB::table('kampanye')->where('id', $kampanye_id)->first();
-
-        if ($kampanye) {
-            // Jika batas tanggal sudah lewat, ubah status ke nonaktif
-            if ($kampanye->batas_tanggal < $now && $kampanye->status == 'aktif') {
-                DB::table('kampanye')
-                    ->where('id', $kampanye_id)
-                    ->update(['status' => 'nonaktif']);
-            }
-
-            // Jika total donasi mencapai atau melebihi batas nominal, ubah status ke nonaktif
-            if ($kampanye->dana_terkumpul >= $kampanye->batas_nominal && $kampanye->status == 'aktif') {
-                DB::table('kampanye')
-                    ->where('id', $kampanye_id)
-                    ->update(['status' => 'nonaktif']);
-            }
+        if (!$kampanye) {
+            return response()->json(['error' => true, 'message' => 'Kampanye tidak ditemukan.'], 404);
         }
+
+        if ($kampanye->status !== 'aktif') {
+            return response()->json(['error' => true, 'message' => 'Kampanye sudah tidak menerima donasi.'], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Simpan donasi
+            $donasiId = DB::table('donasi')->insertGetId([
+                'kampanye_id' => $request->kampanye_id,
+                'nama_donatur' => $request->nama_donatur,
+                'nominal_donasi' => $request->nominal_donasi,
+                'waktu_donasi' => Carbon::now('Asia/Jakarta'),
+            ]);
+
+            // Update total dana_terkumpul
+            $totalDonasi = DB::table('donasi')
+                ->where('kampanye_id', $request->kampanye_id)
+                ->sum('nominal_donasi');
+
+            DB::table('kampanye')
+                ->where('id', $request->kampanye_id)
+                ->update(['dana_terkumpul' => $totalDonasi]);
+
+            // Konfigurasi Midtrans
+            Config::$serverKey = config('midtrans.server_key');
+            Config::$isProduction = config('midtrans.is_production');
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+
+            // Buat order_id yang unik
+            $orderId = 'DONASI-' . $donasiId . '-' . time();
+
+            // Buat parameter untuk Midtrans Snap
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $orderId,
+                    'gross_amount' => (int) $request->nominal_donasi,
+                ],
+                'customer_details' => [
+                    'first_name' => $request->nama_donatur,
+                    'email' => 'user@example.com',
+                    'phone' => '08123456789',
+                ],
+            ];
+            $snapToken = Snap::getSnapToken($params);
+
+            DB::commit();
+
+            return response()->json(['snap_token' => $snapToken]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => true,
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
+
     }
 }

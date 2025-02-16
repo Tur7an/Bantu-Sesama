@@ -1,6 +1,10 @@
 @extends('front.layouts.app')
 @section('content')
 
+<script type="text/javascript"
+    src="https://app.sandbox.midtrans.com/snap/snap.js"
+    data-client-key="{{ config('midtrans.client_key') }}"></script>
+
 @foreach ($kampanye as $k)
 <main class="main">
     <div class="page-title">
@@ -61,107 +65,103 @@
                 <!-- End Card Detail Donasi -->
 
                 <!-- Form Donasi -->
-<div class="col-lg-6 sidebar">
-    <div class="widgets-container">
-        <h4 class="mb-3">Berdonasi</h4>
-        <p class="mb-4">Silahkan isi form di bawah ini untuk melakukan donasi</p>
+                <div class="col-lg-6 sidebar">
+                    <div class="widgets-container">
+                        <h4 class="mb-3">Berdonasi</h4>
+                        <p class="mb-4">Silahkan isi form di bawah ini untuk melakukan donasi</p>
 
-        <form action="{{ route('donasi.store') }}" method="POST" id="donasiForm">
-            @csrf
-            <input type="hidden" name="kampanye_id" value="{{ $k->id }}">
+                        <form id="donasiForm">
+                            @csrf
+                            <input type="hidden" name="kampanye_id" value="{{ $kampanye->first()->id }}">
 
-            <!-- Nama Donatur -->
-            <div class="form-group mb-3">
-                <label for="nama">Nama Donatur</label>
-                <input
-                    id="nama"
-                    name="nama_donatur"
-                    type="text"
-                    class="form-control"
-                    placeholder="Nama (Sembunyikan Nama Dengan 'Orang Baik')"
-                    required
-                >
-                <div class="mt-2">
-                    <button type="button" class="btn btn-outline-dark m-1 btn-sm" onclick="fillName('Orang Baik')">Orang Baik</button>
+                            <!-- Nama Donatur -->
+                            <div class="form-group mb-3">
+                                <label for="nama">Nama Donatur</label>
+                                <input id="nama" name="nama_donatur" type="text" class="form-control"
+                                    placeholder="Nama (Sembunyikan Nama Dengan 'Orang Baik')" required>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-dark m-1 btn-sm" onclick="fillName('Orang Baik')">Orang Baik</button>
+                                </div>
+                            </div>
+
+                            <!-- Nominal Donasi -->
+                            <div class="form-group mb-3">
+                                <label for="nominal">Nominal Donasi</label>
+                                <input id="nominal" name="nominal_donasi" type="number" class="form-control"
+                                    placeholder="Pilih atau isi nominal donasi" required>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(10000)">Rp 10.000</button>
+                                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(20000)">Rp 20.000</button>
+                                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(50000)">Rp 50.000</button>
+                                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(100000)">Rp 100.000</button>
+                                </div>
+                            </div>
+
+                            <!-- Tombol Submit -->
+                            <br>
+                            <div class="text-center">
+                                <button type="button" id="pay-button" class="btn btn-primary">Konfirmasi Donasi</button>
+                            </div>
+                        </form>
+
+                    </div>
                 </div>
-            </div>
-
-            <!-- Nominal Donasi -->
-            <div class="form-group mb-3">
-                <label for="nominal">Nominal Donasi</label>
-                <input
-                    id="nominal"
-                    name="nominal_donasi"
-                    type="number"
-                    class="form-control"
-                    placeholder="Pilih atau isi nominal donasi"
-                    required
-                >
-                <div class="mt-2">
-                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(10000)">Rp 10.000</button>
-                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(20000)">Rp 20.000</button>
-                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(50000)">Rp 50.000</button>
-                    <button type="button" class="btn btn-outline-success m-1 btn-sm" onclick="fillAmount(100000)">Rp 100.000</button>
-                </div>
-            </div>
-
-            <!-- Tombol Submit -->
-            <br>
-            <div class="text-center">
-                <button type="submit" class="btn btn-light m-1">Konfirmasi Donasi</button>
-            </div>
-        </form>
-    </div>
-</div>
-<!-- End Form Donasi -->
-
-<!-- Tambahkan SweetAlert -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Ambil flash session dari Laravel
-        @if (session('success'))
-            Swal.fire({
-                title: "Donasi Berhasil.",
-                text: "{{ session('success') }}",
-                icon: "success",
-                confirmButtonText: "OK"
-            });
-        @endif
-
-        @if (session('error'))
-            Swal.fire({
-                title: "Oops!",
-                text: "{{ session('error') }}",
-                icon: "error",
-                confirmButtonText: "Coba Lagi"
-            });
-        @endif
-    });
-
-    // Fungsi untuk mengisi nama otomatis
-    function fillName(name) {
-        document.getElementById("nama").value = name;
-    }
-
-    // Fungsi untuk mengisi nominal donasi otomatis
-    function fillAmount(amount) {
-        document.getElementById("nominal").value = amount;
-    }
-</script>
-
-            </div>
-        </div>
-    </div>
-</main>
-@endforeach
-<script>
-    function fillName(nama) {
-        document.getElementById('nama').value = nama;
-    }
-    function fillAmount(amount) {
-        document.getElementById('nominal').value = amount;
-    }
-</script>
+                <!-- End Form Donasi -->
+                <!-- Pop-up Midtrans -->
+                <script type="text/javascript">
+                    document.getElementById('pay-button').addEventListener('click', function (event) {
+                        event.preventDefault();
+                        let formData = new FormData(document.getElementById('donasiForm'));
+                        fetch("{{ route('donasi.store') }}", {
+                            method: "POST",
+                            body: formData,
+                            headers: {
+                                "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.snap_token) {
+                                window.snap.pay(data.snap_token, {
+                                    onSuccess: function(result) {
+                                        alert("Pembayaran berhasil!");
+                                        console.log(result);
+                                        location.reload();
+                                    },
+                                    onPending: function(result) {
+                                        alert("Menunggu pembayaran!");
+                                        console.log(result);
+                                    },
+                                    onError: function(result) {
+                                        alert("Pembayaran gagal!");
+                                        console.log(result);
+                                    },
+                                    onClose: function() {
+                                        alert("Anda menutup pop-up tanpa menyelesaikan pembayaran.");
+                                    }
+                                });
+                            } else {
+                                alert("Terjadi kesalahan: " + data.message);
+                                console.error(data);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            alert("Terjadi kesalahan pada server.");
+                        });
+                    });
+                    </script>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+                @endforeach
+                <script>
+                    function fillName(nama) {
+                        document.getElementById('nama').value = nama;
+                    }
+                    function fillAmount(amount) {
+                        document.getElementById('nominal').value = amount;
+                    }
+                </script>
 @endsection
