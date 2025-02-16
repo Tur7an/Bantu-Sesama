@@ -5,6 +5,8 @@
     src="https://app.sandbox.midtrans.com/snap/snap.js"
     data-client-key="{{ config('midtrans.client_key') }}"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Tambahkan SweetAlert -->
+
 @foreach ($kampanye as $k)
 <main class="main">
     <div class="page-title">
@@ -33,13 +35,13 @@
                                 <ul class="list-inline mb-0">
                                     <li class="list-inline-item me-3">
                                         @php
-                                        $now = \Carbon\Carbon::now(); // Waktu saat ini
-                                        $targetDate = \Carbon\Carbon::parse($k->batas_tanggal); // Tanggal batas dari database
-                                        $daysLeft = $now->lessThan($targetDate) ? round($now->diffInDays($targetDate), 0) : 0; // Hitung sisa hari dan bulatkan
+                                        $now = \Carbon\Carbon::now();
+                                        $targetDate = \Carbon\Carbon::parse($k->batas_tanggal);
+                                        $daysLeft = $now->lessThan($targetDate) ? round($now->diffInDays($targetDate), 0) : 0;
                                         @endphp
-                                            <p><i class="bi bi-clock me-2"></i><b>Waktu Tersisa:</b>
-                                                {{ $daysLeft > 0 ? $daysLeft . ' hari lagi' : 'Waktu habis' }}
-                                            </p>
+                                        <p><i class="bi bi-clock me-2"></i><b>Waktu Tersisa:</b>
+                                            {{ $daysLeft > 0 ? $daysLeft . ' hari lagi' : 'Waktu habis' }}
+                                        </p>
                                     </li><br>
                                     <li class="list-inline-item">
                                         <span><b>Terkumpul:</b> Rp.{{ number_format($k->dana_terkumpul, 0, ',', '.') }}</span>
@@ -107,10 +109,32 @@
                     </div>
                 </div>
                 <!-- End Form Donasi -->
-                <!-- Pop-up Midtrans -->
-                <script type="text/javascript">
+
+                <!-- Validasi dan SweetAlert -->
+                <script>
                     document.getElementById('pay-button').addEventListener('click', function (event) {
                         event.preventDefault();
+
+                        let nama = document.getElementById('nama').value.trim();
+                        let nominal = document.getElementById('nominal').value.trim();
+
+                        // Validasi Nama Donatur
+                        if (nama === '') {
+                            Swal.fire('Error!', 'Nama Donatur wajib diisi.', 'error');
+                            return;
+                        }
+
+                        // Validasi Nominal Donasi
+                        if (nominal === '') {
+                            Swal.fire('Error!', 'Nominal Donasi wajib diisi.', 'error');
+                            return;
+                        }
+
+                        if (isNaN(nominal) || nominal < 1000) {
+                            Swal.fire('Error!', 'Minimal Nominal Donasi adalah Rp. 1000 dan harus berupa angka.', 'error');
+                            return;
+                        }
+
                         let formData = new FormData(document.getElementById('donasiForm'));
                         fetch("{{ route('donasi.store') }}", {
                             method: "POST",
@@ -124,39 +148,29 @@
                             if (data.snap_token) {
                                 window.snap.pay(data.snap_token, {
                                     onSuccess: function(result) {
-                                        alert("Pembayaran berhasil!");
+                                        Swal.fire('Berhasil!', 'Pembayaran berhasil!', 'success');
                                         console.log(result);
                                         location.reload();
                                     },
                                     onPending: function(result) {
-                                        alert("Menunggu pembayaran!");
+                                        Swal.fire('Menunggu!', 'Menunggu pembayaran!', 'warning');
                                         console.log(result);
                                     },
                                     onError: function(result) {
-                                        alert("Pembayaran gagal!");
+                                        Swal.fire('Gagal!', 'Pembayaran gagal!', 'error');
                                         console.log(result);
                                     },
                                     onClose: function() {
-                                        alert("Anda menutup pop-up tanpa menyelesaikan pembayaran.");
+                                        Swal.fire('Dibatalkan!', 'Anda menutup pop-up tanpa menyelesaikan pembayaran.', 'info');
                                     }
                                 });
                             } else {
-                                alert("Terjadi kesalahan: " + data.message);
-                                console.error(data);
+                                Swal.fire('Error!', 'Terjadi kesalahan: ' + data.message, 'error');
                             }
                         })
-                        .catch(error => {
-                            console.error("Error:", error);
-                            alert("Terjadi kesalahan pada server.");
-                        });
+                        .catch(error => Swal.fire('Error!', 'Terjadi kesalahan pada server.', 'error'));
                     });
-                    </script>
-                            </div>
-                        </div>
-                    </div>
-                </main>
-                @endforeach
-                <script>
+
                     function fillName(nama) {
                         document.getElementById('nama').value = nama;
                     }
@@ -164,4 +178,9 @@
                         document.getElementById('nominal').value = amount;
                     }
                 </script>
+            </div>
+        </div>
+    </div>
+</main>
+@endforeach
 @endsection
